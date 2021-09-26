@@ -9,11 +9,13 @@ primary_expression:
  FLOATCONSTANT
  BOOLCONSTANT
  ( expression )
+field_selection:
+ IDENTIFIER
 postfix_expression:
  primary_expression
  postfix_expression LEFT_BRACKET integer_expression RIGHT_BRACKET
  function_call
- postfix_expression DOT FIELD_SELECTION
+ postfix_expression . field_selection
  postfix_expression ++
  postfix_expression --
 integer_expression:
@@ -22,7 +24,7 @@ function_call:
  function_call_or_method
 function_call_or_method:
  function_call_generic
- postfix_expression DOT function_call_generic
+ postfix_expression . function_call_generic
 function_call_generic:
  function_call_header_with_parameters )
  function_call_header_no_parameters )
@@ -39,7 +41,7 @@ function_call_header:
 function_identifier:
  type_specifier
  IDENTIFIER
- FIELD_SELECTION
+ field_selection
 unary_expression:
  postfix_expression
  ++ unary_expression
