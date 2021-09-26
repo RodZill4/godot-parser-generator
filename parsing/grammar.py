@@ -56,15 +56,15 @@ class Grammar:
         self.__first_sets = {}
 
         # Update the references of each production and, while at it, recognize terminal symbols
-        nonterminal_by_name = {nt.name: nt for nt in self.nonterms}
+        self.nonterminal_by_name = {nt.name: nt for nt in self.nonterms}
         for nt in self.nonterms:
             for prod in nt.productions:
                 for idx in range(len(prod)):
                     symbol = prod[idx]
 
                     if isinstance(symbol, str):
-                        if symbol in nonterminal_by_name:
-                            prod[idx] = nonterminal_by_name[symbol]
+                        if symbol in self.nonterminal_by_name:
+                            prod[idx] = self.nonterminal_by_name[symbol]
                         else:
                             self.terminals += tuple([symbol])
                     elif isinstance(symbol, NonTerminal):

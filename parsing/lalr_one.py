@@ -69,15 +69,15 @@ class ParsingTable:
                         continue
 
                     next_state_id = goto_precalc[state_id][terminal]
-                    self.action[state_id][terminal].add(('shift and go to state', next_state_id))
+                    self.action[state_id][terminal].add("s%d" % next_state_id)
                 else:
                     if prod_index == 0:
                         # We are dealing with an item of the artificial starting symbol
                         assert(next_symbol == grammar.EOF_SYMBOL)
-                        self.action[state_id][grammar.EOF_SYMBOL].add(('accept', ''))
+                        self.action[state_id][grammar.EOF_SYMBOL].add("a")
                     else:
                         # We are dealing with a regular non-terminal
-                        self.action[state_id][next_symbol].add(('reduce using rule', prod_index))
+                        self.action[state_id][next_symbol].add("r%d" % prod_index)
 
             for nt in self.nonterms:
                 if nt not in goto_precalc[state_id]:
@@ -178,6 +178,40 @@ class ParsingTable:
 
                 writer.writerow(row)
 
+    def generate_code(self, file_name):
+        with open(file_name, 'w') as file:
+            file.write("extends \"res://addons/material_maker/parser/parser_base.gd\"\n\n")
+            file.write("const RULES : Array = [\n")
+            for i in range(len(self.grammar.productions)):
+                p = self.grammar.productions[i]
+                symbols = [(i if isinstance(i, str) else i.name) for i in p[1]]
+                function_name = "build_%s" % p[0]
+                nonterm_offset = self.grammar.nonterm_offset[self.grammar.nonterminal_by_name[p[0]]]
+                if i > nonterm_offset:
+                    function_name += "_%d" % ( i+1-nonterm_offset )
+                file.write("\t{ nonterm=\"%s\", rule=[%s], function=\"%s\" },\n" % ( p[0], "" if len(symbols) == 0 else " \""+"\", \"".join(symbols)+"\" ", function_name ))
+            file.write("]\n\n")
+            file.write("const ACTIONS = [\n")
+            for a in self.action:
+                terminals = []
+                for t in a.keys():
+                    if len(a[t]) > 0:
+                        terminals.append("\"%s\": \"%s\"" % ( t, "/conflict/".join(a[t]) ))
+                file.write("\t{ %s },\n" % ", ".join(terminals))
+            file.write("]\n\n")
+            file.write("const GOTOS = [\n")
+            for g in self.goto:
+                non_terminals = []
+                for nt in g.keys():
+                    if g[nt] != None:
+                        non_terminals.append("\"%s\": %d" % ( nt, g[nt] ))
+                file.write("\t{ %s },\n" % ", ".join(non_terminals))
+            file.write("]\n\n")
+            file.write("func _init():\n")
+            file.write("\trules = RULES\n")
+            file.write("\tactions = ACTIONS\n")
+            file.write("\tgotos = GOTOS\n")
+            file.close()
 
 class LrZeroItemTableEntry:
     def __init__(self):

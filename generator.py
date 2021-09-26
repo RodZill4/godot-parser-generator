@@ -1,9 +1,43 @@
 from parsing import *
+from parsing.grammar import *
+import sys
 import samples
 
 
 def get_grammar():
-    return samples.get_sample_1()
+    return samples.get_sample_9()
+
+
+def read_grammar(filename):
+    non_terminals = []
+    with open(filename, 'r') as f:
+        nt = ""
+        productions = []
+        for i, l in enumerate(f, 1):
+            comment_pos = l.find("//")
+            if comment_pos != -1:
+                l = l[:comment_pos]
+            l = l.replace("/* empty */", "EMPTY")
+            if l == "":
+                pass
+            elif l[0] == " ":
+                production = l.strip().split(" ")
+                if len(production) == 1 and production[0] == "EMPTY":
+                    production = []
+                productions.append(production)
+            else:
+                l = l.strip()
+                colon_pos = l.find(":")
+                if colon_pos != -1:
+                    if nt != "":
+                        non_terminals.append(NonTerminal(nt, productions))
+                    nt = l[:colon_pos]
+                    productions = []
+        if nt != "":
+            non_terminals.append(NonTerminal(nt, productions))
+    grammar = Grammar(non_terminals)
+
+    return grammar
 
 
 def describe_grammar(gr):
@@ -35,11 +69,13 @@ def describe_parsing_table(table):
 
 
 def main():
+    gr = read_grammar(sys.argv[1])
     print('Working on it...')
-    gr = get_grammar()
     table = lalr_one.ParsingTable(gr)
     print("I'm done.")
+    table.generate_code(sys.argv[2])
 
+    """
     output_filename = 'parsing-table'
 
     with open(output_filename + '.txt', 'w') as textfile:
@@ -48,7 +84,7 @@ def main():
         textfile.write(describe_parsing_table(table))
 
     table.save_to_csv(output_filename + '.csv')
-
+    """
 
 if __name__ == "__main__":
     main()
