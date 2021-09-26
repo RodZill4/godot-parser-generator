@@ -75,7 +75,6 @@ def main():
     print("I'm done.")
     table.generate_code(sys.argv[2])
 
-    """
     output_filename = 'parsing-table'
 
     with open(output_filename + '.txt', 'w') as textfile:
@@ -83,6 +82,7 @@ def main():
         textfile.write('\n\n')
         textfile.write(describe_parsing_table(table))
 
+    """
     table.save_to_csv(output_filename + '.csv')
     """
 

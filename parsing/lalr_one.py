@@ -88,7 +88,7 @@ class ParsingTable:
     @staticmethod
     def __stringify_action_entries(term, ent):
         return '\tfor terminal %s: ' % term + \
-               ', '.join('%s %s' % (kind, str(arg)) for kind, arg in ent)
+               ', '.join(ent)
 
     @staticmethod
     def __stringify_goto_entry(nt, sid):
@@ -138,7 +138,7 @@ class ParsingTable:
         if len(e) <= 1:
             return STATUS_OK
 
-        n_actions = len(frozenset(x for x, y in e))
+        n_actions = len(e)
         return STATUS_SR_CONFLICT if n_actions == 2 else STATUS_RR_CONFLICT
 
     def get_single_state_conflict_status(self, state_id):

@@ -41,7 +41,7 @@ function_call_header:
 function_identifier:
  type_specifier
  IDENTIFIER
- field_selection
+// field_selection
 unary_expression:
  postfix_expression
  ++ unary_expression
@@ -65,54 +65,54 @@ additive_expression:
  additive_expression - multiplicative_expression
 shift_expression:
  additive_expression
- shift_expression LEFT_OP additive_expression // reserved
- shift_expression RIGHT_OP additive_expression // reserved
+ shift_expression << additive_expression // reserved
+ shift_expression >> additive_expression // reserved
 relational_expression:
  shift_expression
- relational_expression LEFT_ANGLE shift_expression
- relational_expression RIGHT_ANGLE shift_expression
- relational_expression LE_OP shift_expression
- relational_expression GE_OP shift_expression
+ relational_expression < shift_expression
+ relational_expression > shift_expression
+ relational_expression <= shift_expression
+ relational_expression >= shift_expression
 equality_expression:
  relational_expression
- equality_expression EQ_OP relational_expression
- equality_expression NE_OP relational_expression
+ equality_expression == relational_expression
+ equality_expression != relational_expression
 and_expression:
  equality_expression
- and_expression AMPERSAND equality_expression // reserved
+ and_expression & equality_expression // reserved
 exclusive_or_expression:
  and_expression
- exclusive_or_expression CARET and_expression // reserved
+ exclusive_or_expression ^ and_expression // reserved
 inclusive_or_expression:
  exclusive_or_expression
- inclusive_or_expression VERTICAL_BAR exclusive_or_expression // reserved
+ inclusive_or_expression | exclusive_or_expression // reserved
 logical_and_expression:
  inclusive_or_expression
- logical_and_expression AND_OP inclusive_or_expression
+ logical_and_expression && inclusive_or_expression
 logical_xor_expression:
  logical_and_expression
- logical_xor_expression XOR_OP logical_and_expression
+ logical_xor_expression ^^ logical_and_expression
 logical_or_expression:
  logical_xor_expression
- logical_or_expression OR_OP logical_xor_expression
+ logical_or_expression || logical_xor_expression
 conditional_expression:
  logical_or_expression
- logical_or_expression QUESTION expression COLON assignment_expression
+ logical_or_expression ? expression : assignment_expression
 assignment_expression:
  conditional_expression
  unary_expression assignment_operator assignment_expression
 assignment_operator:
- EQUAL
- MUL_ASSIGN
- DIV_ASSIGN
- MOD_ASSIGN // reserved
- ADD_ASSIGN
- SUB_ASSIGN
- LEFT_ASSIGN // reserved
- RIGHT_ASSIGN // reserved
- AND_ASSIGN // reserved
- XOR_ASSIGN // reserved
- OR_ASSIGN // reserved
+ =
+ *=
+ /=
+ %= // reserved
+ +=
+ -=
+ <<= // reserved
+ >>= // reserved
+ &= // reserved
+ ^= // reserved
+ |= // reserved
 expression:
  assignment_expression
  expression , assignment_expression
@@ -151,17 +151,17 @@ init_declarator_list:
  init_declarator_list , IDENTIFIER
  init_declarator_list , IDENTIFIER LEFT_BRACKET RIGHT_BRACKET
  init_declarator_list , IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET
- init_declarator_list , IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer
- init_declarator_list , IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer
- init_declarator_list , IDENTIFIER EQUAL initializer
+ init_declarator_list , IDENTIFIER LEFT_BRACKET RIGHT_BRACKET = initializer
+ init_declarator_list , IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET = initializer
+ init_declarator_list , IDENTIFIER = initializer
 single_declaration:
  fully_specified_type
  fully_specified_type IDENTIFIER
  fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET
  fully_specified_type IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET
- fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET EQUAL initializer
- fully_specified_type IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET EQUAL initializer
- fully_specified_type IDENTIFIER EQUAL initializer
+ fully_specified_type IDENTIFIER LEFT_BRACKET RIGHT_BRACKET = initializer
+ fully_specified_type IDENTIFIER LEFT_BRACKET constant_expression RIGHT_BRACKET = initializer
+ fully_specified_type IDENTIFIER = initializer
  INVARIANT IDENTIFIER // Vertex only.
 // Grammar Note: No 'enum', or 'typedef'.
 fully_specified_type:
@@ -183,8 +183,8 @@ type_specifier_nonarray:
  struct_specifier
  TYPE_NAME
 struct_specifier:
- STRUCT IDENTIFIER LEFT_BRACE struct_declaration_list RIGHT_BRACE
- STRUCT LEFT_BRACE struct_declaration_list RIGHT_BRACE
+ STRUCT IDENTIFIER { struct_declaration_list }
+ STRUCT { struct_declaration_list }
 struct_declaration_list:
  struct_declaration
  struct_declaration_list struct_declaration
@@ -211,14 +211,14 @@ simple_statement:
  iteration_statement
  jump_statement
 compound_statement:
- LEFT_BRACE RIGHT_BRACE
- LEFT_BRACE statement_list RIGHT_BRACE
+ { }
+ { statement_list }
 statement_no_new_scope:
  compound_statement_no_new_scope
  simple_statement
 compound_statement_no_new_scope:
- LEFT_BRACE RIGHT_BRACE
- LEFT_BRACE statement_list RIGHT_BRACE
+ { }
+ { statement_list }
 statement_list:
  statement
  statement_list statement
@@ -233,7 +233,7 @@ selection_rest_statement:
 // Grammar Note: No 'switch'. Switch statements not supported.
 condition:
  expression
- fully_specified_type IDENTIFIER EQUAL initializer
+ fully_specified_type IDENTIFIER = initializer
 iteration_statement:
  WHILE ( condition ) statement_no_new_scope
  DO statement WHILE ( expression ) ;
